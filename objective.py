@@ -12,13 +12,6 @@ class Objective(BaseObjective):
     # All parameters 'p' defined here are available as 'self.p'
     parameters = {}
 
-    #def get_one_solution(self):
-        ## Return one solution. This should be compatible with 'self.compute'.
-        ## Solutions of NMF are length two lists with W and H
-        #m, n = self.X.shape
-        #rank = self.rank
-        #return [np.zeros((m, rank)),np.zeros((rank, n))]
-
     def set_data(self, X, rank):
         # The keyword arguments of this function are the keys of the `data`
         # dict in the `get_data` function of the dataset.
@@ -32,7 +25,7 @@ class Objective(BaseObjective):
         # `get_result` method of the solver.
         # They are customizable.
         # TODO: also allow other losses
-        frob = 1/2*np.linalg.norm(self.X - np.dot(self.fac[0], self.fac[1]))**2
+        frob = 1/2*np.linalg.norm(self.X - np.dot(fac[0], fac[1]))**2
         return frob
 
     def to_dict(self):
