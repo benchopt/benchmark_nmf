@@ -10,17 +10,18 @@ class Dataset(BaseDataset):
     # List of parameters to generate the datasets. The benchmark will consider
     # the cross product for each key in the dictionary.
     parameters = {
-        'm_dim, n_dim, true_rank': [
-            (100, 50, 5),
-            (99, 21, 1)],
+        'm_dim, n_dim, true_rank, estimated_rank': [
+            (100, 50, 5, 6),
+            (99, 21, 1, 1)],
         'snr': 100,
     }
 
-    def __init__(self, m_dim=10, n_dim=50, true_rank=5, snr=100, random_state=27):
+    def __init__(self, m_dim=10, n_dim=50, true_rank=5, estimated_rank=6, snr=100, random_state=27):
         # Store the parameters of the dataset
         self.m_dim = m_dim
         self.n_dim = n_dim
         self.true_rank = true_rank
+        self.estimated_rank = estimated_rank
         self.snr = snr
         self.random_state = random_state
 
@@ -37,7 +38,7 @@ class Dataset(BaseDataset):
         sigma = (10**(-self.snr/20))*np.linalg.norm(X)/np.linalg.norm(noise)
         X = X + sigma*noise
 
-        # `data` holds the keyword arguments for the `set_data` method of the
+        # `data` (this output) holds the keyword arguments for the `set_data` method of the
         # objective.
         # They are customizable.
-        return dict(W=W, H=H, X=X, sigma=sigma)
+        return dict(W=W, H=H, X=X, rank=self.estimated_rank, sigma=sigma)

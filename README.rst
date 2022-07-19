@@ -17,6 +17,8 @@ $$X \\in \\mathbb{R}^{m \\times n}$$
 
 In short, matrix $X$ is approximated by a low rank matrix $WH$ where each low-rank factor $W$ and $H$ have nonnegative entries, which makes NMF a part-based decomposition.
 
+The rank for the NMF must be provided in the dataset. Several values may be specified, but the responsability of chosing candidate rank values by default does not fall on the solvers, nor the objective.
+
 Install
 --------
 
