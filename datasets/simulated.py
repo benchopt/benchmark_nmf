@@ -11,9 +11,9 @@ class Dataset(BaseDataset):
     # the cross product for each key in the dictionary.
     parameters = {
         'm_dim, n_dim, true_rank, estimated_rank': [
-            (100, 50, 5, 6),
+            (50, 50, 5, 5),
             (99, 21, 1, 1)],
-        'snr': 100,
+        'snr': [100, 20],
     }
 
     def __init__(self, m_dim=10, n_dim=50, true_rank=5, estimated_rank=6, snr=100, random_state=27):
@@ -34,11 +34,12 @@ class Dataset(BaseDataset):
         W = rng.rand(self.m_dim, self.true_rank)
         H = rng.rand(self.true_rank, self.m_dim)
         X = np.dot(W,H)
-        noise = rng.randn(X.shape)
+        noise = rng.randn(*X.shape)
         sigma = (10**(-self.snr/20))*np.linalg.norm(X)/np.linalg.norm(noise)
         X = X + sigma*noise
 
         # `data` (this output) holds the keyword arguments for the `set_data` method of the
         # objective.
         # They are customizable.
-        return dict(W=W, H=H, X=X, rank=self.estimated_rank, sigma=sigma)
+        # TODO: return W,H for tracking sources
+        return dict(X=X, rank=self.estimated_rank)
