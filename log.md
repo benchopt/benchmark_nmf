@@ -10,7 +10,7 @@
 - I am not sure I like the fact that one run is cut into several calls, which are timed, to build the loss/time curve. Some methods required knowledge of the previous iterations, and cutting the run like this make degrade performances? Why not require the methods to return time? Or at least make sure somehow all the variables are left untouched when chopping the run (maybe this is the case, but it is not clearly explained in the doc?)  
 
 
-  2. About the runs
+2. About the runs
 
 - It is still not clear to me how the maximal number of iterations is set. I went deep in benchopt code, and clearly things are happening under the hood to set this maxiter, but I wish it was easier to control the stopping criterion in general? If it is easy, e.g. with the CLI interface, then it is not so clear in the doc.
      (Note: after writing this I found the -n options in the CLI, with default 100; it is not put forth enough)
