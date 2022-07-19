@@ -8,6 +8,7 @@ with safe_import_context() as import_ctx:
 
 class Objective(BaseObjective):
     name = "Nonnegative Matrix Factorization"
+    is_convex = False
 
     # All parameters 'p' defined here are available as 'self.p'
     parameters = {
