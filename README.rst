@@ -8,7 +8,7 @@ reproducible the comparisons of optimization algorithms.
 This benchmark is dedicated to solver of Nonnegative Matrix Factorization:
 
 
-$$\\min_{W\in \\mathbb{R}^{m\\times r}_+, H\\in \\mathbb{R}^{r\\times n}_+} f(X, WH)$$
+$$\\min_{W\\in \\mathbb{R}^{m\\times r}_+, H\\in \\mathbb{R}^{r\\times n}_+} f(X, WH)$$
 
 
 where $m, n$ stand for respectively for the number of rows and columns of the data matrix $X$ which may have negative entries, 
@@ -32,7 +32,7 @@ Apart from the problem, options can be passed to ``benchopt run``, to restrict t
 
 .. code-block::
 
-	$ benchopt run benchmark-nmf -s solver1 -d dataset2 --max-runs 10 --n-repetitions 10
+	$ benchopt run benchmark-nmf -s python-gd -d simulated --max-runs 10 --n-repetitions 10
 
 
 Use ``benchopt run -h`` for more details about these options, or visit https://benchopt.github.io/api.html.
