@@ -10,24 +10,34 @@ class Dataset(BaseDataset):
     # List of parameters to generate the datasets. The benchmark will consider
     # the cross product for each key in the dictionary.
     parameters = {
-        'n_samples, n_features': [
-            (1000, 500),
-            (5000, 200)]
+        'm_dim, n_dim, true_rank': [
+            (100, 50, 5),
+            (99, 21, 1)],
+        'snr': 100,
     }
 
-    def __init__(self, n_samples=10, n_features=50, random_state=27):
+    def __init__(self, m_dim=10, n_dim=50, true_rank=5, snr=100, random_state=27):
         # Store the parameters of the dataset
-        self.n_samples = n_samples
-        self.n_features = n_features
+        self.m_dim = m_dim
+        self.n_dim = n_dim
+        self.true_rank = true_rank
+        self.snr = snr
         self.random_state = random_state
 
     def get_data(self):
+        '''
+        The generated factors are uniform on [0,1], the data is noised with elementwise Gaussian iid noise. The Signal to Noise ratio is specified by the user.
+        '''
 
         rng = np.random.RandomState(self.random_state)
-        X = rng.randn(self.n_samples, self.n_features)
-        y = rng.randn(self.n_samples)
+        W = rng.rand(self.m_dim, self.true_rank)
+        H = rng.rand(self.true_rank, self.m_dim)
+        X = np.dot(W,H)
+        noise = rng.randn(X.shape)
+        sigma = (10**(-self.snr/20))*np.linalg.norm(X)/np.linalg.norm(noise)
+        X = X + sigma*noise
 
         # `data` holds the keyword arguments for the `set_data` method of the
         # objective.
         # They are customizable.
-        return dict(X=X, y=y)
+        return dict(W=W, H=H, X=X, sigma=sigma)
