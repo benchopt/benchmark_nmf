@@ -32,11 +32,11 @@ class Objective(BaseObjective):
         # `get_result` method of the solver.
         # They are customizable.
         # TODO: also allow other losses
-        frob = np.linalg.norm(self.X - np.dot(self.fac[0], self.fac[1]))**2 # TODO: self.fac
+        frob = 1/2*np.linalg.norm(self.X - np.dot(self.fac[0], self.fac[1]))**2
         return frob
 
     def to_dict(self):
         # The output of this function are the keyword arguments
         # for the `set_objective` method of the solver.
         # They are customizable.
-        return dict(X=self.X)
+        return dict(X=self.X, rank=self.rank)
