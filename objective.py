@@ -16,7 +16,8 @@ class Objective(BaseObjective):
         # The keyword arguments of this function are the keys of the `data`
         # dict in the `get_data` function of the dataset.
         # They are customizable.
-        # TODO: handle W and H known in only some cases, to track source identification
+        # TODO: handle W and H known in only some cases, to track source
+        # identification
         self.X = X
         self.rank = rank
 

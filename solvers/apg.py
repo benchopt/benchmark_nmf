@@ -28,7 +28,7 @@ class Solver(BaseSolver):
         n_inner_iter = self.n_inner_iter
 
         # initialization with random values (TODO: improve?)
-        self.fac = [np.random.rand(m,rank),np.random.rand(rank,n)]
+        self.fac = [np.random.rand(m, rank), np.random.rand(rank, n)]
 
         for _ in range(n_iter):
             HHt = np.dot(self.fac[1], self.fac[1].T)
@@ -36,7 +36,8 @@ class Solver(BaseSolver):
             Lw = np.linalg.norm(HHt)  # upper bound of Lw
             # W update
             for inner in range(n_inner_iter):
-                self.fac[0] = np.maximum(self.fac[0] - (np.dot(self.fac[0], HHt) - XHt ) / Lw, 0)
+                self.fac[0] = np.maximum(
+                    self.fac[0] - (np.dot(self.fac[0], HHt) - XHt) / Lw, 0)
 
             # H update
             WtW = np.dot(self.fac[0].T, self.fac[0])
@@ -44,7 +45,8 @@ class Solver(BaseSolver):
             Lh = np.linalg.norm(WtW)  # upper bound for Lh
             # H update
             for inner in range(n_inner_iter):
-                self.fac[1] = np.maximum(self.fac[1] - (np.dot(WtW, self.fac[1]) - WtX ) / Lh, 0)
+                self.fac[1] = np.maximum(
+                    self.fac[1] - (np.dot(WtW, self.fac[1]) - WtX) / Lh, 0)
 
     def get_result(self):
         # The outputs of this function are the arguments of the
