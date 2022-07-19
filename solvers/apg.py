@@ -8,27 +8,31 @@ class Solver(BaseSolver):
     '''
     Alternating Proximal gradient
     '''
-    name = "Alternating Proximal Gradient, without acceleration"
+    name = "apg"
 
     # any parameter defined here is accessible as a class attribute
     parameters = {
         'n_inner_iter': [1, 5]
     }
 
-    def set_objective(self, X, rank):
+    def set_objective(self, X, rank, fac_init):
         # The arguments of this function are the results of the
         # `to_dict` method of the objective.
         # They are customizable.
         self.X = X
         self.rank = rank
+        self.fac_init = fac_init  # None if not initialized beforehand
 
     def run(self, n_iter):
         m, n = self.X.shape
         rank = self.rank
         n_inner_iter = self.n_inner_iter
 
-        # initialization with random values (TODO: improve?)
-        self.fac = [np.random.rand(m, rank), np.random.rand(rank, n)]
+        if not self.fac_init:
+            # Random init if init is not provided
+            self.fac = [np.random.rand(m, rank), np.random.rand(rank, n)]
+        else:
+            self.fac = [np.copy(self.fac_init[i]) for i in range(2)]
 
         for _ in range(n_iter):
             HHt = np.dot(self.fac[1], self.fac[1].T)

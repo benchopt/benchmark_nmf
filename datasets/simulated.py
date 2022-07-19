@@ -28,7 +28,7 @@ class Dataset(BaseDataset):
     def get_data(self):
         '''
         The generated factors are uniform on [0,1], the data is noised
-        with elementwise Gaussian iid noise. 
+        with elementwise Gaussian iid noise.
         The Signal to Noise ratio is specified by the user.
         '''
 

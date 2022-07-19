@@ -10,7 +10,9 @@ class Objective(BaseObjective):
     name = "Nonnegative Matrix Factorization"
 
     # All parameters 'p' defined here are available as 'self.p'
-    parameters = {}
+    parameters = {
+        'share_init': [True]
+    }
 
     def set_data(self, X, rank):
         # The keyword arguments of this function are the keys of the `data`
@@ -29,8 +31,18 @@ class Objective(BaseObjective):
         frob = 1/2*np.linalg.norm(self.X - np.dot(fac[0], fac[1]))**2
         return frob
 
-    def to_dict(self):
+    def to_dict(self, random_state=27):
         # The output of this function are the keyword arguments
         # for the `set_objective` method of the solver.
         # They are customizable.
-        return dict(X=self.X, rank=self.rank)
+        # we compute a random seeded init here to share across methods!
+        m, n = self.X.shape
+        rank = self.rank
+        if self.share_init:
+            rng = np.random.RandomState(random_state)
+            fac_init = [rng.rand(m, rank), rng.rand(rank, n)]
+            for factor in fac_init:
+                factor.flags.writeable = False  # Read Only
+        else:
+            fac_init = None
+        return dict(X=self.X, rank=self.rank, fac_init=fac_init)
