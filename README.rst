@@ -34,7 +34,7 @@ Apart from the problem, options can be passed to ``benchopt run``, to restrict t
 
 .. code-block::
 
-	$ benchopt run benchmark-nmf -s python-gd -d simulated --max-runs 10 --n-repetitions 10
+	$ benchopt run benchmark-nmf -s apg -d simulated --max-runs 10 --n-repetitions 10
 
 
 Use ``benchopt run -h`` for more details about these options, or visit https://benchopt.github.io/api.html.
