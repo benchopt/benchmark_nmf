@@ -1,5 +1,5 @@
 
-NMF Benchopt Benchmark
+Benchmark Repository for Nonnegative Matrix Factorization
 =====================
 |Build Status| |Python 3.6+|
 
