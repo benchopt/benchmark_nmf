@@ -1,5 +1,5 @@
 
-NME Benchopt Benchmark
+NMF Benchopt Benchmark
 =====================
 |Build Status| |Python 3.6+|
 
