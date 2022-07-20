@@ -34,8 +34,8 @@ class Objective(BaseObjective):
         # `get_result` method of the solver.
         # They are customizable.
         # TODO: also allow other losses
-        H, W = fac
-        frob = 1/2*np.linalg.norm(self.X - np.dot(H, W))**2
+        W, H = fac
+        frob = 1/2*np.linalg.norm(self.X - np.dot(W, H))**2
         return frob
 
     def to_dict(self, random_state=27):
