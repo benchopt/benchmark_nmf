@@ -1,5 +1,5 @@
 
-My Benchopt Benchmark
+NME Benchopt Benchmark
 =====================
 |Build Status| |Python 3.6+|
 
