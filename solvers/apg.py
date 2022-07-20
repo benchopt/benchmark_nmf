@@ -15,6 +15,8 @@ class Solver(BaseSolver):
         'n_inner_iter': [1, 5]
     }
 
+    stop_strategy = "callback"
+
     def set_objective(self, X, rank, fac_init):
         # The arguments of this function are the results of the
         # `to_dict` method of the objective.
@@ -23,34 +25,36 @@ class Solver(BaseSolver):
         self.rank = rank
         self.fac_init = fac_init  # None if not initialized beforehand
 
-    def run(self, n_iter):
+    def run(self, callback):
         m, n = self.X.shape
         rank = self.rank
         n_inner_iter = self.n_inner_iter
 
         if not self.fac_init:
             # Random init if init is not provided
-            self.fac = [np.random.rand(m, rank), np.random.rand(rank, n)]
+            W, H = [np.random.rand(m, rank), np.random.rand(rank, n)]
         else:
-            self.fac = [np.copy(self.fac_init[i]) for i in range(2)]
+            W, H = [np.copy(self.fac_init[i]) for i in range(2)]
 
-        for _ in range(n_iter):
-            HHt = np.dot(self.fac[1], self.fac[1].T)
-            XHt = np.dot(self.X, self.fac[1].T)
+        while callback((W, H)):
+            HHt = np.dot(H, H.T)
+            XHt = np.dot(self.X, H.T)
             Lw = np.linalg.norm(HHt)  # upper bound of Lw
             # W update
             for inner in range(n_inner_iter):
-                self.fac[0] = np.maximum(
-                    self.fac[0] - (np.dot(self.fac[0], HHt) - XHt) / Lw, 0)
+                W = np.maximum(
+                    W - (np.dot(W, HHt) - XHt) / Lw, 0)
 
             # H update
-            WtW = np.dot(self.fac[0].T, self.fac[0])
-            WtX = np.dot(self.fac[0].T, self.X)
+            WtW = np.dot(W.T, W)
+            WtX = np.dot(W.T, self.X)
             Lh = np.linalg.norm(WtW)  # upper bound for Lh
             # H update
             for inner in range(n_inner_iter):
-                self.fac[1] = np.maximum(
-                    self.fac[1] - (np.dot(WtW, self.fac[1]) - WtX) / Lh, 0)
+                H = np.maximum(
+                    H - (np.dot(WtW, H) - WtX) / Lh, 0)
+
+        self.fac = (W, H)
 
     def get_result(self):
         # The outputs of this function are the arguments of the
