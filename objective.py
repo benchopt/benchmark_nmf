@@ -4,6 +4,8 @@ from benchopt import BaseObjective, safe_import_context
 # Useful for autocompletion and install commands
 with safe_import_context() as import_ctx:
     import numpy as np
+    # importing scipy for KL div
+    from scipy.special import kl_div
 
 
 class Objective(BaseObjective):
@@ -12,7 +14,8 @@ class Objective(BaseObjective):
 
     # All parameters 'p' defined here are available as 'self.p'
     parameters = {
-        'share_init': [True]
+        'share_init': [True],
+        'loss_type': ['frobenius','kl']
     }
 
     def get_one_solution(self):
@@ -33,10 +36,22 @@ class Objective(BaseObjective):
         # The arguments of this function are the outputs of the
         # `get_result` method of the solver.
         # They are customizable.
-        # TODO: also allow other losses
-        W, H = fac
-        frob = 1/2*np.linalg.norm(self.X - np.dot(W, H))**2
-        return frob
+        # Note: one particular metric should be used to check convergence, thus the logic on outputs. Maybe better way?
+        output_dic = {}
+        if 'frobenius' in self.loss_type:
+            # If frobenius is asked, use it to check convergence
+            W, H = fac
+            frob = 1/2*np.linalg.norm(self.X - np.dot(W, H))**2
+            output_dic.update({'value': frob})
+        if 'kl' in self.loss_type:
+            # If KL is asked but not frobenius, use it to check convergence, otherwise it is a secondary return
+            W, H = fac
+            kl_loss = np.sum(kl_div(self.X, np.dot(W, H)))
+            if 'frobenius' in self.loss_type:
+                output_dic.update({'kl': kl_loss})
+            else:
+                output_dic.update({'value': kl_loss})
+        return output_dic
 
     def to_dict(self, random_state=27):
         # The output of this function are the keyword arguments
