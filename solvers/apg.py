@@ -15,7 +15,7 @@ class Solver(BaseSolver):
         'n_inner_iter': [1, 5]
     }
 
-    stop_strategy = "callback"
+    stopping_strategy = "callback"
 
     def set_objective(self, X, rank, fac_init):
         # The arguments of this function are the results of the
