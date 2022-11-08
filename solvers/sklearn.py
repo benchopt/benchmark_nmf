@@ -9,11 +9,12 @@ class Solver(BaseSolver):
     '''
     Alternating Proximal gradient
     '''
-    name = "sklearn-mu"
+    name = "sklearn"
     requirements = ['scikit-learn']
 
     # any parameter defined here is accessible as a class attribute
     parameters = {
+        "solver": ["mu", "cd"]
     }
 
     def set_objective(self, X, rank, factors_init):
@@ -25,14 +26,15 @@ class Solver(BaseSolver):
         if factors_init:
             # creating the scikit-learn problem instance
             self.factors_init = factors_init
-            self.clf = NMF(n_components=rank, init="custom", solver="mu",
+            self.clf = NMF(n_components=rank, init="custom", solver=self.solver,
                            tol=0, max_iter=1e32)
         else:
-            self.clf = NMF(n_components=rank, solver="mu",
+            self.clf = NMF(n_components=rank, solver=self.solver,
                            tol=0, max_iter=1e32)
 
     def run(self, n_iter):
         self.clf.max_iter = n_iter + 1 # TODO: sklearn doesn't work with max_iter=0
+
         if self.clf.init == "custom":
             self.W = self.clf.fit_transform(self.X, W=np.copy(self.factors_init[0]),
                          H=np.copy(self.factors_init[1]))
