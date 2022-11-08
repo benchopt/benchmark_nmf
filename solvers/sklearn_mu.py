@@ -16,15 +16,15 @@ class Solver(BaseSolver):
     parameters = {
     }
 
-    def set_objective(self, X, rank, fac_init):
+    def set_objective(self, X, rank, factors_init):
         # The arguments of this function are the results of the
         # `to_dict` method of the objective.
         # They are customizable.
         self.X = X
         self.rank = rank
-        if fac_init:
+        if factors_init:
             # creating the scikit-learn problem instance
-            self.fac_init = fac_init
+            self.factors_init = factors_init
             self.clf = NMF(n_components=rank, init="custom", solver="mu",
                            tol=0, max_iter=1e32)
         else:
@@ -34,8 +34,8 @@ class Solver(BaseSolver):
     def run(self, n_iter):
         self.clf.max_iter = n_iter + 1 # TODO: sklearn doesn't work with max_iter=0
         if self.clf.init == "custom":
-            self.W = self.clf.fit_transform(self.X, W=np.copy(self.fac_init[0]),
-                         H=np.copy(self.fac_init[1]))
+            self.W = self.clf.fit_transform(self.X, W=np.copy(self.factors_init[0]),
+                         H=np.copy(self.factors_init[1]))
         else:
             self.W = self.clf.fit_transform(self.X)
 
