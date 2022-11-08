@@ -26,7 +26,7 @@ class Objective(BaseObjective):
         n, m = self.X.shape
         return np.zeros((n, self.rank)), np.zeros((self.rank, m))
 
-    def set_data(self, X, rank, true_fac=None):
+    def set_data(self, X, rank, true_factors=None):
         # The keyword arguments of this function are the keys of the `data`
         # dict in the `get_data` function of the dataset.
         # They are customizable.
@@ -34,15 +34,15 @@ class Objective(BaseObjective):
         # identification
         self.X = X
         self.rank = rank
-        self.true_fac = true_fac
+        self.true_factors = true_factors
 
-    def compute(self, fac):
+    def compute(self, factors):
         # The arguments of this function are the outputs of the
         # `get_result` method of the solver.
         # They are customizable.
         # Note: one particular metric should be used to check convergence,
         # thus the logic on outputs.
-        W, H = fac
+        W, H = factors
         if 'frobenius' == self.loss_type:
             # If frobenius is asked, use it to check convergence
             value = 1/2*np.linalg.norm(self.X - np.dot(W, H))**2
@@ -50,10 +50,10 @@ class Objective(BaseObjective):
             # If KL is asked but not frobenius, use it to check convergence,
             #  otherwise it is a secondary return
             value = np.sum(kl_div(self.X, np.dot(W, H)))
-        if self.true_fac:
+        if self.true_factors:
             #  compute factor match score
             #  first, solve permutation and scaling ambiguity
-            W_true, H_true = self.true_fac
+            W_true, H_true = self.true_factors
             Ht = H.T
             Ht_true = H_true.T
             W = W/np.linalg.norm(W, axis=0)
@@ -77,9 +77,9 @@ class Objective(BaseObjective):
         rank = self.rank
         if self.share_init:
             rng = np.random.RandomState(random_state)
-            fac_init = [rng.rand(m, rank), rng.rand(rank, n)]
-            for factor in fac_init:
+            factors_init = [rng.rand(m, rank), rng.rand(rank, n)]
+            for factor in factors_init:
                 factor.flags.writeable = False  # Read Only
         else:
-            fac_init = None
-        return dict(X=self.X, rank=self.rank, fac_init=fac_init)
+            factors_init = None
+        return dict(X=self.X, rank=self.rank, factors_init=factors_init)

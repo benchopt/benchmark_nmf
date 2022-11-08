@@ -44,4 +44,4 @@ class Dataset(BaseDataset):
         #  method of the objective.
         # They are customizable.
         # TODO: return W,H for tracking sources
-        return dict(X=X, rank=self.estimated_rank, true_fac=[W, H])
+        return dict(X=X, rank=self.estimated_rank, true_factors=[W, H])

@@ -17,24 +17,24 @@ class Solver(BaseSolver):
 
     stopping_strategy = "callback"
 
-    def set_objective(self, X, rank, fac_init):
+    def set_objective(self, X, rank, factors_init):
         # The arguments of this function are the results of the
         # `to_dict` method of the objective.
         # They are customizable.
         self.X = X
         self.rank = rank
-        self.fac_init = fac_init  # None if not initialized beforehand
+        self.factors_init = factors_init  # None if not initialized beforehand
 
     def run(self, callback):
         m, n = self.X.shape
         rank = self.rank
         n_inner_iter = self.n_inner_iter
 
-        if not self.fac_init:
+        if not self.factors_init:
             # Random init if init is not provided
             W, H = [np.random.rand(m, rank), np.random.rand(rank, n)]
         else:
-            W, H = [np.copy(self.fac_init[i]) for i in range(2)]
+            W, H = [np.copy(self.factors_init[i]) for i in range(2)]
 
         while callback((W, H)):
             HHt = np.dot(H, H.T)
@@ -54,10 +54,10 @@ class Solver(BaseSolver):
                 H = np.maximum(
                     H - (np.dot(WtW, H) - WtX) / Lh, 0)
 
-        self.fac = (W, H)
+        self.factors = [W, H]
 
     def get_result(self):
         # The outputs of this function are the arguments of the
         # `compute` method of the objective.
         # They are customizable.
-        return self.fac
+        return self.factors
