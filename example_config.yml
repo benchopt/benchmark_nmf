@@ -1,0 +1,11 @@
+objective: # Choose loss type
+  - Nonnegative Matrix Factorization[loss_type=frobenius,share_init=True]
+dataset: # dataset to run benchmark on
+  - simulated
+solver: # list of example solvers to do benchmark
+  - sklearn[loss=frobenius]
+  - tensorly
+  - apg
+
+# note: use more repetitions to have quantiles on the plot
+n-repetitions: 1
