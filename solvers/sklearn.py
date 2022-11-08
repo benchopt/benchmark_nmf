@@ -9,7 +9,7 @@ class Solver(BaseSolver):
     '''
     Alternating Proximal gradient
     '''
-    name = "sklearn-mu"
+    name = "sklearn"
     requirements = ['scikit-learn']
 
     # any parameter defined here is accessible as a class attribute
