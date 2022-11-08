@@ -10,11 +10,13 @@ class Solver(BaseSolver):
     Alternating Proximal gradient
     '''
     name = "sklearn"
+    install_cmd = 'conda'    
     requirements = ['scikit-learn']
 
     # any parameter defined here is accessible as a class attribute
     parameters = {
-        "solver": ["mu", "cd"]
+        "solver": ["mu", "cd"],
+        "loss": ["frobenius", "kullback-leibler", "itakura-saito", 1.5]
     }
 
     def set_objective(self, X, rank, factors_init):
@@ -27,10 +29,10 @@ class Solver(BaseSolver):
             # creating the scikit-learn problem instance
             self.factors_init = factors_init
             self.clf = NMF(n_components=rank, init="custom", solver=self.solver,
-                           tol=0, max_iter=1e32)
+                           beta_loss=self.loss, tol=0, max_iter=1e32)
         else:
             self.clf = NMF(n_components=rank, solver=self.solver,
-                           tol=0, max_iter=1e32)
+                           lbeta_loss=self.loss, tol=0, max_iter=1e32)
 
     def run(self, n_iter):
         self.clf.max_iter = n_iter + 1 # TODO: sklearn doesn't work with max_iter=0

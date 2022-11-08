@@ -16,7 +16,10 @@ class Solver(BaseSolver):
     }
 
     #stopping_strategy = "callback"
-
+    
+    install_cmd = 'conda'
+    requirements = ['pip:tensorly']
+ 
     def set_objective(self, X, rank, factors_init):
         # The arguments of this function are the results of the
         # `to_dict` method of the objective.

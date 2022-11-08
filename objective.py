@@ -8,7 +8,7 @@ with safe_import_context() as import_ctx:
     from scipy.special import kl_div
     # Requires Tensorly >=0.8, postpone implementation
     #import tensorly
-    #from tensorly.cp_tensor import cp_normalize, cp_permute_factors
+    # from tensorly.cp_tensor import cp_normalize, cp_permute_factors
 
 
 
@@ -22,6 +22,11 @@ class Objective(BaseObjective):
         # losses will be computed on different runs
         'loss_type': ['frobenius', 'kl']  # TODO: 'all' for all losses simult
     }
+
+    # install_cmd = 'conda'
+    # requirements = [
+    #     'pip:git+https://github.com/tensorly/tensorly@main'
+    # ]
 
     def get_one_solution(self):
         # Return one solution. This should be compatible with 'self.compute'.
@@ -60,15 +65,15 @@ class Objective(BaseObjective):
             Ht_true = H_true.T
 
             ## tensorly version, requires Tensorly >= 0.8
-            #factors_tl = [W, Ht]
-            #factors_tl_true = [W_true, Ht_true]
-            #factors_tl = cp_normalize((None,factors_tl))
-            #factors_tl_true = cp_normalize((None,factors_tl_true))
-            #_, factors_tl = cp_permute_factors((None,factors_tl_true), (None,factors_tl))[0]
-            #fms = np.prod(
-                #np.diag(factors_tl[0].T@factors_tl_true[0])*
-                #np.diag(factors_tl[1].T@factors_tl_true[1])
-                #)
+            # factors_tl = [W, Ht]
+            # factors_tl_true = [W_true, Ht_true]
+            # factors_tl = cp_normalize((None,factors_tl))
+            # factors_tl_true = cp_normalize((None,factors_tl_true))
+            # _, factors_tl = cp_permute_factors((None,factors_tl_true), (None,factors_tl))[0]
+            # fms = np.prod(
+            #     np.diag(factors_tl[0].T@factors_tl_true[0])*
+            #     np.diag(factors_tl[1].T@factors_tl_true[1])
+            #     )
             
             ## native version
             W = W/np.linalg.norm(W, axis=0)
@@ -80,6 +85,7 @@ class Objective(BaseObjective):
             W = W[:, perms]
             Ht = Ht[:, perms]
             fms = np.prod(np.diag(W.T@W_true)*np.diag(Ht.T@Ht_true))
+            
             return {'value': value, 'fms': fms}
         return value
 
