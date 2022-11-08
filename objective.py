@@ -82,8 +82,8 @@ class Objective(BaseObjective):
             Ht_true = Ht_true/np.linalg.norm(Ht_true, axis=0)
             # TODO: suboptimal permutation for now, want to use tensorly but bugged
             perms = np.argmax((W.T@W_true)*(Ht.T@Ht_true), axis=1)
-            W = W[:, perms]
-            Ht = Ht[:, perms]
+            W = W[:, perms].squeeze()
+            Ht = Ht[:, perms].squeeze()
             fms = np.prod(np.diag(W.T@W_true)*np.diag(Ht.T@Ht_true))
             
             return {'value': value, 'fms': fms}

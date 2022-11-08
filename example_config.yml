@@ -4,6 +4,7 @@ dataset: # dataset to run benchmark on
   - simulated
 solver: # list of example solvers to do benchmark
   - sklearn[loss=frobenius]
+  - nimfa
   - tensorly
   - apg
 
