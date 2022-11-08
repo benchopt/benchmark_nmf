@@ -2,6 +2,7 @@ from benchopt import BaseSolver, safe_import_context
 
 with safe_import_context() as import_ctx:
     from sklearn.decomposition import NMF
+    import numpy as np
 
 
 class Solver(BaseSolver):
@@ -31,17 +32,15 @@ class Solver(BaseSolver):
                            tol=0, max_iter=1e32)
 
     def run(self, n_iter):
-        self.clf.max_iter = n_iter
+        self.clf.max_iter = n_iter + 1 # TODO: sklearn doesn't work with max_iter=0
         if self.clf.init == "custom":
-            self.clf.fit(self.X, W=self.fac_init[0],
-                         H=self.fac_init[1])
+            self.W = self.clf.fit_transform(self.X, W=np.copy(self.fac_init[0]),
+                         H=np.copy(self.fac_init[1]))
         else:
-            self.clf.fit(self.X)
+            self.W = self.clf.fit_transform(self.X)
 
     def get_result(self):
         # The outputs of this function are the arguments of the
         # `compute` method of the objective.
-        # They are customizable.
-        # TODO: Bad to call fit_transform?
-        fac = [self.clf.fit_transform(self.X), self.components_]
-        return fac
+        # They are customizable.        
+        return [self.W, self.clf.components_]
