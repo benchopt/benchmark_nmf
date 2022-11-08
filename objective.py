@@ -18,7 +18,7 @@ class Objective(BaseObjective):
     def get_one_solution(self):
         # Return one solution. This should be compatible with 'self.compute'.
         n, m = self.X.shape
-        return np.ones((n, self.rank)), np.ones((self.rank, m))
+        return np.zeros((n, self.rank)), np.zeros((self.rank, m))
 
     def set_data(self, X, rank):
         # The keyword arguments of this function are the keys of the `data`
@@ -29,13 +29,12 @@ class Objective(BaseObjective):
         self.X = X
         self.rank = rank
 
-    def compute(self, fac):
+    def compute(self, W, H):
         # The arguments of this function are the outputs of the
         # `get_result` method of the solver.
         # They are customizable.
         # TODO: also allow other losses
-        W, H = fac
-        frob = 1/2*np.linalg.norm(self.X - np.dot(W, H))**2
+        frob = 1/2 * np.linalg.norm(self.X - W @ H) ** 2
         return frob
 
     def to_dict(self, random_state=27):
