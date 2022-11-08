@@ -15,7 +15,7 @@ class Solver(BaseSolver):
 
     # any parameter defined here is accessible as a class attribute
     parameters = {
-        "solver": ["mu", "cd"],
+        "strategy": ["mu", "cd"],
         "loss": ["frobenius", "kullback-leibler", "itakura-saito", 1.5]
     }
 
@@ -28,10 +28,10 @@ class Solver(BaseSolver):
         if factors_init:
             # creating the scikit-learn problem instance
             self.factors_init = factors_init
-            self.clf = NMF(n_components=rank, init="custom", solver=self.solver,
+            self.clf = NMF(n_components=rank, init="custom", solver=self.strategy,
                            beta_loss=self.loss, tol=0, max_iter=1e32)
         else:
-            self.clf = NMF(n_components=rank, solver=self.solver,
+            self.clf = NMF(n_components=rank, solver=self.strategy,
                            lbeta_loss=self.loss, tol=0, max_iter=1e32)
 
     def run(self, n_iter):
