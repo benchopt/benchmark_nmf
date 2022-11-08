@@ -24,7 +24,7 @@ class Objective(BaseObjective):
     def get_one_solution(self):
         # Return one solution. This should be compatible with 'self.compute'.
         n, m = self.X.shape
-        return np.ones((n, self.rank)), np.ones((self.rank, m))
+        return np.zeros((n, self.rank)), np.zeros((self.rank, m))
 
     def set_data(self, X, rank, true_fac=None):
         # The keyword arguments of this function are the keys of the `data`
@@ -36,7 +36,7 @@ class Objective(BaseObjective):
         self.rank = rank
         self.true_fac = true_fac
 
-    def compute(self, fac):
+    def compute(self, W, H):
         # The arguments of this function are the outputs of the
         # `get_result` method of the solver.
         # They are customizable.
@@ -44,17 +44,14 @@ class Objective(BaseObjective):
         # thus the logic on outputs.
         if 'frobenius' == self.loss_type:
             # If frobenius is asked, use it to check convergence
-            W, H = fac
             value = 1/2*np.linalg.norm(self.X - np.dot(W, H))**2
         if 'kl' == self.loss_type:
             # If KL is asked but not frobenius, use it to check convergence,
             #  otherwise it is a secondary return
-            W, H = fac
             value = np.sum(kl_div(self.X, np.dot(W, H)))
         if self.true_fac:
             #  compute factor match score
             #  first, solve permutation and scaling ambiguity
-            W, H = fac
             W_true, H_true = self.true_fac
             W = W/np.linalg.norm(W, axis=0)
             H = H/np.linalg.norm(H, axis=1)
