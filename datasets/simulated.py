@@ -11,12 +11,12 @@ class Dataset(BaseDataset):
     # the cross product for each key in the dictionary.
     parameters = {
         'm_dim, n_dim, true_rank, estimated_rank': [
-            (50, 50, 5, 5)],
+            (50, 50, 3, 3)],
         'snr': [100],
     }
 
     def __init__(self, m_dim=10, n_dim=50, true_rank=5, estimated_rank=6,
-                 snr=100, random_state=27):
+                 snr=100, random_state=26):
         # Store the parameters of the dataset
         self.m_dim = m_dim
         self.n_dim = n_dim

@@ -36,12 +36,13 @@ class Objective(BaseObjective):
         self.rank = rank
         self.true_fac = true_fac
 
-    def compute(self, W, H):
+    def compute(self, fac):
         # The arguments of this function are the outputs of the
         # `get_result` method of the solver.
         # They are customizable.
         # Note: one particular metric should be used to check convergence,
         # thus the logic on outputs.
+        W, H = fac
         if 'frobenius' == self.loss_type:
             # If frobenius is asked, use it to check convergence
             value = 1/2*np.linalg.norm(self.X - np.dot(W, H))**2
@@ -53,15 +54,17 @@ class Objective(BaseObjective):
             #  compute factor match score
             #  first, solve permutation and scaling ambiguity
             W_true, H_true = self.true_fac
+            Ht = H.T
+            Ht_true = H_true.T
             W = W/np.linalg.norm(W, axis=0)
-            H = H/np.linalg.norm(H, axis=1)
+            Ht = Ht/np.linalg.norm(Ht, axis=0)
             W_true = W_true/np.linalg.norm(W_true, axis=0)
-            H_true = H_true/np.linalg.norm(H_true, axis=1)
+            Ht_true = Ht_true/np.linalg.norm(Ht_true, axis=0)
             # TODO: suboptimal permutation for now, want to use tensorly but bugged
-            perms = np.argmax((W.T@W_true)*(H@H_true.T), axis=1)
+            perms = np.argmax((W.T@W_true)*(Ht.T@Ht_true), axis=1)
             W = W[:, perms]
-            H = H[perms, :]
-            fms = np.prod(np.diag(W.T@W_true)*np.diag(H@H_true.T))
+            Ht = Ht[:, perms]
+            fms = np.prod(np.diag(W.T@W_true)*np.diag(Ht.T@Ht_true))
             return {'value': value, 'fms': fms}
         return value
 
