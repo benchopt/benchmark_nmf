@@ -16,8 +16,14 @@ class Solver(BaseSolver):
     # any parameter defined here is accessible as a class attribute
     parameters = {
         "strategy": ["mu", "cd"],
-        "loss": ["frobenius", "kullback-leibler", "itakura-saito", 1.5]
+        "loss": ["frobenius"] # Other choices: float, "kullback-leibler", "itakura-saito"
     }
+
+    def skip(self, X, rank, factors_init):
+        if self.loss != "frobenius" and self.strategy != "mu":
+            return True, f"{self.name} only implements the MU strategy for the chosen loss"
+
+        return False, None
 
     def set_objective(self, X, rank, factors_init):
         # The arguments of this function are the results of the
