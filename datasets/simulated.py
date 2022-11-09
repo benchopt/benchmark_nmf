@@ -43,5 +43,4 @@ class Dataset(BaseDataset):
         # `data` (this output) holds the keyword arguments for the `set_data`
         #  method of the objective.
         # They are customizable.
-        # TODO: return W,H for tracking sources
         return dict(X=X, rank=self.estimated_rank, true_factors=[W, H])
