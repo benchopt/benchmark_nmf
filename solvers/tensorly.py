@@ -3,6 +3,7 @@ from benchopt import BaseSolver, safe_import_context
 with safe_import_context() as import_ctx:
     from tensorly.decomposition._nn_cp import non_negative_parafac_hals, non_negative_parafac
     import numpy as np
+    import copy
 
 class Solver(BaseSolver):
     '''
@@ -27,15 +28,15 @@ class Solver(BaseSolver):
         self.X = X
         self.rank = rank
         if factors_init:
-            self.init = (None, [np.copy(factors_init[0]),np.copy(factors_init[1].T)])
+            self.init = (None, [factors_init[0], factors_init[1].T])
         else:
             self.init = 'random'
 
     def run(self, n_iter):
         if self.strategy == 'MU':
-            out = non_negative_parafac(self.X, self.rank, n_iter_max=n_iter, init=self.init, tol=0)
+            out = non_negative_parafac(self.X, self.rank, n_iter_max=n_iter, init=copy.deepcopy(self.init), tol=0)
         else:
-            out = non_negative_parafac_hals(self.X, self.rank, n_iter_max=n_iter, init=self.init, tol=0)
+            out = non_negative_parafac_hals(self.X, self.rank, n_iter_max=n_iter, init=copy.deepcopy(self.init), tol=0)
         factors = out[1]
         self.factors = [factors[0],factors[1].T]
 
