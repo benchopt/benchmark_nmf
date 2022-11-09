@@ -19,7 +19,7 @@ class Dataset(BaseDataset):
     }
 
     install_cmd = 'conda'
-    requirements = ['pip:cryprography==36.0.2'] # TODO check
+    requirements = ['pip:cryptography==36.0.2'] # TODO check
 
     def __init__(self, m_dim=10, n_dim=50, true_rank=5, estimated_rank=6,
                  snr=100, random_state=26, pixel_subsample=True):
