@@ -13,13 +13,21 @@ class Solver(BaseSolver):
 
     # any parameter defined here is accessible as a class attribute
     parameters = {
-        'strategy': ['MU', 'ALS-PG']
+        'strategy': ['MU', 'ALS-PG'],
+        'loss': ['euclidean'] # Other choices: 'divergence' (for KL)
     }
 
     #stopping_strategy = "callback"
 
     install_cmd = 'conda'
     requirements = ['pip:nimfa']
+
+    def skip(self, X, rank, factors_init):
+        if self.loss != "euclidean" and self.strategy != "MU":
+            return True, f"{self.name} only implements the MU strategy for the chosen loss"
+
+        return False, None
+
 
     def set_objective(self, X, rank, factors_init):
         # The arguments of this function are the results of the
@@ -41,7 +49,7 @@ class Solver(BaseSolver):
             H = np.copy(self.init[1])            
         
         if self.strategy ==  'MU':
-            nmf = nimfa.Nmf(self.X, rank=self.rank, update='euclidean', max_iter=n_iter, 
+            nmf = nimfa.Nmf(self.X, rank=self.rank, update=self.loss, max_iter=n_iter,
                             min_residual=0, W=W, H=H, test_conv=0)
         elif self.strategy ==  'ALS-PG':
             # TODO: Add inner_sub_iter to parameters ?
