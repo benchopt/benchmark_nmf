@@ -58,4 +58,7 @@ class Solver(BaseSolver):
         # The outputs of this function are the arguments of the
         # `compute` method of the objective.
         # They are customizable.
-        return self.factors
+        # for nimfa, recast to avoid broadcasting and argmax errors
+        W = np.array(self.factors[0])
+        H = np.array(self.factors[1])
+        return [W,H]
