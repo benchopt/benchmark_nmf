@@ -41,7 +41,8 @@ class Solver(BaseSolver):
             H = np.copy(self.init[1])            
         
         if self.strategy ==  'MU':
-            nmf = nimfa.Nmf(self.X, rank=self.rank, update='euclidean', max_iter=n_iter, min_residual=0, W=W, H=H)
+            nmf = nimfa.Nmf(self.X, rank=self.rank, update='euclidean', max_iter=n_iter, 
+                            min_residual=0, W=W, H=H, test_conv=0)
         elif self.strategy ==  'ALS-PG':
             # TODO: Add inner_sub_iter to parameters ?
             nmf = nimfa.Lsnmf(self.X, rank=self.rank, max_iter=n_iter, sub_iter=10,
