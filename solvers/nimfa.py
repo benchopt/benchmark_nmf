@@ -37,7 +37,7 @@ class Solver(BaseSolver):
             W = np.copy(self.init[0])
             H = np.copy(self.init[1])
             if self.strategy ==  'MU':
-                nmf = nimfa.Nmf(self.X, rank=self.rank, update='euclidean', max_iter=n_iter, min_residual=0, W=W, H=H)
+                nmf = nimfa.Nmf(self.X, rank=self.rank, update='euclidean', max_iter=n_iter, min_residual=0, W=W, H=H, test_conv=0)
         else:
             if self.strategy ==  'MU':
                 nmf = nimfa.Nmf(self.X, rank=self.rank, update='euclidean', max_iter=n_iter,
@@ -51,4 +51,7 @@ class Solver(BaseSolver):
         # The outputs of this function are the arguments of the
         # `compute` method of the objective.
         # They are customizable.
-        return self.factors
+        # for nimfa, recast to avoid broadcasting and argmax errors
+        W = np.array(self.factors[0])
+        H = np.array(self.factors[1])
+        return [W,H]
