@@ -13,7 +13,7 @@ class Solver(BaseSolver):
 
     # any parameter defined here is accessible as a class attribute
     parameters = {
-        'strategy': ['MU']#, 'ALS-PG']
+        'strategy': ['MU', 'ALS-PG']
     }
 
     #stopping_strategy = "callback"
@@ -33,15 +33,22 @@ class Solver(BaseSolver):
             self.init = 'random'
 
     def run(self, n_iter):
-        if self.init != 'random': # todo improve
-            W = np.copy(self.init[0])
-            H = np.copy(self.init[1])
-            if self.strategy ==  'MU':
-                nmf = nimfa.Nmf(self.X, rank=self.rank, update='euclidean', max_iter=n_iter, min_residual=0, W=W, H=H)
+        if self.init == 'random':
+            W = np.random.rand(self.X.shape[0], self.rank)
+            H = np.random.rand(self.rank, self.X.shape[1])
         else:
-            if self.strategy ==  'MU':
-                nmf = nimfa.Nmf(self.X, rank=self.rank, update='euclidean', max_iter=n_iter,
-                min_residual=0)
+            W = np.copy(self.init[0])
+            H = np.copy(self.init[1])            
+        
+        if self.strategy ==  'MU':
+            nmf = nimfa.Nmf(self.X, rank=self.rank, update='euclidean', max_iter=n_iter, min_residual=0, W=W, H=H)
+        elif self.strategy ==  'ALS-PG':
+            # TODO: Add inner_sub_iter to parameters ?
+            nmf = nimfa.Lsnmf(self.X, rank=self.rank, max_iter=n_iter, sub_iter=10,
+                              inner_sub_iter=10, beta=0.1, W=W, H=H)
+        else:
+            raise ValueError("Strategy not suported")
+
         nmf_fit = nmf()
         W = nmf_fit.basis()
         H = nmf_fit.coef()
