@@ -53,13 +53,11 @@ class Solver(BaseSolver):
         nmf_fit = nmf()
         W = nmf_fit.basis()
         H = nmf_fit.coef()
-        self.factors = [W,H]
+        # Recast to avoid broadcasting and argmax errors
+        self.factors = [np.array(W),np.array(H)]
 
     def get_result(self):
         # The outputs of this function are the arguments of the
         # `compute` method of the objective.
         # They are customizable.
-        # for nimfa, recast to avoid broadcasting and argmax errors
-        W = np.array(self.factors[0])
-        H = np.array(self.factors[1])
-        return [W,H]
+        return self.factors
