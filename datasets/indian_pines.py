@@ -6,6 +6,7 @@ from benchopt import BaseDataset, safe_import_context
 from urllib.request import urlopen
 import scipy.io
 from io import BytesIO
+import cryptography
 
 class Dataset(BaseDataset):
 
@@ -19,7 +20,7 @@ class Dataset(BaseDataset):
     }
 
     install_cmd = 'conda'
-    requirements = ['pip:cryptography==36.0.2'] # TODO check
+    requirements = ['cryptography=36.0.2']
 
     def __init__(self, m_dim=10, n_dim=50, true_rank=5, estimated_rank=6,
                  snr=100, random_state=26, pixel_subsample=True):
