@@ -13,6 +13,7 @@ with safe_import_context() as import_ctx:
 
 
 class Objective(BaseObjective):
+    min_benchopt_version = "1.3"
     name = "Nonnegative Matrix Factorization"
     is_convex = False
 
@@ -89,7 +90,7 @@ class Objective(BaseObjective):
             return {'value': value, 'fms': fms}
         return value
 
-    def to_dict(self, random_state=27):
+    def get_objective(self, random_state=27):
         # The output of this function are the keyword arguments
         # for the `set_objective` method of the solver.
         # They are customizable.
