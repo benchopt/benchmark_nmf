@@ -9,6 +9,17 @@ with safe_import_context() as import_ctx:
     import scipy.io
     import numpy as np
 
+    # Downgrading cryptography is necessary when using OpenSSL3
+    import ssl
+    MAX_CRYPTO_VERSION = None
+    if ssl.OPENSSL_VERSION.startswith("OpenSSL 3"):
+        MAX_CRYPTO_VERSION = "36.0.2"
+        import cryptography
+        if cryptography.__version__ > MAX_CRYPTO_VERSION:
+            raise ImportError(
+                f"Need to downgrade cryptography to {MAX_CRYPTO_VERSION}"
+            )
+
 DATA_URL = "http://ehu.eus/ccwintco/uploads/6/67/Indian_pines_corrected.mat"
 # Put this in `data` folder of the benchmark folder
 DATA_FILE = Path(__file__).parent / "data" / "indian_pines_corrected.npy"
@@ -21,21 +32,16 @@ class Dataset(BaseDataset):
     # List of parameters to generate the datasets. The benchmark will consider
     # the cross product for each key in the dictionary.
     parameters = {
-        'm_dim, n_dim, pixel_subsample, true_rank, estimated_rank': [
-            (200, 145**2, True, 4, 4)]
+        'm_dim': [200],
+        'n_dim': [145 ** 2],
+        'pixel_subsample': [True],
+        'true_rank': [4],
+        'estimated_rank': [4],
+        'random_state': [26],
     }
 
     install_cmd = 'conda'
-    requirements = ['cryptography=36.0.2']
-
-    def __init__(self, m_dim=10, n_dim=50, true_rank=5, estimated_rank=6,
-                 snr=100, random_state=26, pixel_subsample=True):
-        # Store the parameters of the dataset
-        self.m_dim = m_dim
-        self.n_dim = n_dim
-        self.true_rank = true_rank
-        self.estimated_rank = estimated_rank
-        self.random_state = random_state
+    requirements = [f'cryptography{"=36.0.2" if MAX_CRYPTO_VERSION else ""}']
 
     def get_data(self):
         '''
