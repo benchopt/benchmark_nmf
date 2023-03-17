@@ -4,6 +4,7 @@ with safe_import_context() as import_ctx:
     import nimfa
     import numpy as np
 
+
 class Solver(BaseSolver):
     '''
     MU implementations in nimfa
@@ -14,20 +15,22 @@ class Solver(BaseSolver):
     # any parameter defined here is accessible as a class attribute
     parameters = {
         'strategy': ['MU', 'ALS-PG'],
-        'loss': ['euclidean'] # Other choices: 'divergence' (for KL)
+        'loss': ['euclidean']  # Other choices: 'divergence' (for KL)
     }
 
-    #stopping_strategy = "callback"
+    stopping_strategy = "iteration"
 
     install_cmd = 'conda'
     requirements = ['pip:nimfa']
 
     def skip(self, X, rank, factors_init):
         if self.loss != "euclidean" and self.strategy != "MU":
-            return True, f"{self.name} only implements the MU strategy for the chosen loss"
+            return True, (
+                f"{self.name} only implements the MU strategy "
+                "for the chosen loss"
+            )
 
         return False, None
-
 
     def set_objective(self, X, rank, factors_init):
         # The arguments of this function are the results of the
@@ -46,15 +49,19 @@ class Solver(BaseSolver):
             H = np.random.rand(self.rank, self.X.shape[1])
         else:
             W = np.copy(self.init[0])
-            H = np.copy(self.init[1])            
-        
-        if self.strategy ==  'MU':
-            nmf = nimfa.Nmf(self.X, rank=self.rank, update=self.loss, max_iter=n_iter,
-                            min_residual=0, W=W, H=H, test_conv=0)
-        elif self.strategy ==  'ALS-PG':
+            H = np.copy(self.init[1])
+
+        if self.strategy == 'MU':
+            nmf = nimfa.Nmf(
+                self.X, rank=self.rank, update=self.loss, max_iter=n_iter,
+                min_residual=0, W=W, H=H, test_conv=0
+            )
+        elif self.strategy == 'ALS-PG':
             # TODO: Add inner_sub_iter to parameters ?
-            nmf = nimfa.Lsnmf(self.X, rank=self.rank, max_iter=n_iter, sub_iter=10,
-                              inner_sub_iter=10, beta=0.1, W=W, H=H)
+            nmf = nimfa.Lsnmf(
+                self.X, rank=self.rank, max_iter=n_iter, sub_iter=10,
+                inner_sub_iter=10, beta=0.1, W=W, H=H
+            )
         else:
             raise ValueError("Strategy not suported")
 
@@ -62,7 +69,7 @@ class Solver(BaseSolver):
         W = nmf_fit.basis()
         H = nmf_fit.coef()
         # Recast to avoid broadcasting and argmax errors
-        self.factors = [np.array(W),np.array(H)]
+        self.factors = [np.array(W), np.array(H)]
 
     def get_result(self):
         # The outputs of this function are the arguments of the
