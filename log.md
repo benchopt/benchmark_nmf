@@ -1,5 +1,19 @@
 ## A few comments on what I found hard/confusion when implementing the benchmark
 
+Sprint July 2023 TODOS:
+-----------------------
+- Benchmark NMF: finish it
+  - compute all losses all the time
+  - fix suboptimal permutation at evaluation with tensorly
+  - add other data (e.g. faces?)
+  - (optional) fix nimfa, add other solvers
+  - (optional) fix scikit-learn +1 iteration being unfair
+
+- Documentation more practical (could need some help):
+  - Tutorial on how to write a benchmark ? (use a simple case like ridge?). Useful for devs to better know how to implement new benchmarks, useful for users who understand how it works and the basic ways to tweak a benchmark. Include a graph of relationship between the methods of classes. Start from template benchmark and add regularization. Add another simulation or a true dataset?
+  - other solution: start from scratch (longer and less robust)
+  - Cheatsheet with common command lines
+
 Sprint November 2022 comments
 --------------------------------
 - cheatcheets/GUIDED examples 

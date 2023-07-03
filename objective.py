@@ -7,6 +7,7 @@ with safe_import_context() as import_ctx:
     # importing scipy for KL div
     from scipy.special import kl_div
     # Requires Tensorly >=0.8, postpone implementation
+    # TODO
     # import tensorly
     # from tensorly.cp_tensor import cp_normalize, cp_permute_factors
 
@@ -19,7 +20,7 @@ class Objective(BaseObjective):
     # All parameters 'p' defined here are available as 'self.p'
     parameters = {
         'share_init': [True],
-        # TODO: 'all' for all losses simult
+        # TODO: 'all' for all losses simult, should be new default
         # losses will be computed on different runs
         'loss_type': ['frobenius']  # , 'kl']
     }
