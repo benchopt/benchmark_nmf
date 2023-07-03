@@ -1,4 +1,5 @@
 from benchopt import BaseSolver, safe_import_context
+from benchopt.stopping_criterion import SufficientProgressCriterion
 
 with safe_import_context() as import_ctx:
     import nimfa
@@ -21,6 +22,7 @@ class Solver(BaseSolver):
 
     install_cmd = 'conda'
     requirements = ['pip:nimfa']
+    stopping_criterion = SufficientProgressCriterion(patience=20)  # TODO check if fixes issue
 
     def skip(self, X, rank, factors_init):
         if self.loss != "euclidean" and self.strategy != "MU":
