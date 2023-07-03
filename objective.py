@@ -4,7 +4,6 @@ from benchopt import BaseObjective, safe_import_context
 # Useful for autocompletion and install commands
 with safe_import_context() as import_ctx:
     import numpy as np
-    # importing scipy for KL div
     from scipy.special import kl_div
     # Requires Tensorly >=0.8, postpone implementation
     # TODO
@@ -20,9 +19,6 @@ class Objective(BaseObjective):
     # All parameters 'p' defined here are available as 'self.p'
     parameters = {
         'share_init': [True],
-        # TODO: 'all' for all losses simult, should be new default
-        # losses will be computed on different runs
-        'loss_type': ['frobenius']  # , 'kl']
     }
 
     # install_cmd = 'conda'
@@ -49,16 +45,16 @@ class Objective(BaseObjective):
         # The arguments of this function are the outputs of the
         # `get_result` method of the solver.
         # They are customizable.
-        # Note: one particular metric should be used to check convergence,
-        # thus the logic on outputs.
         W, H = factors
-        if 'frobenius' == self.loss_type:
-            # If frobenius is asked, use it to check convergence
-            value = 1/2*np.linalg.norm(self.X - np.dot(W, H))**2
-        if 'kl' == self.loss_type:
-            # If KL is asked but not frobenius, use it to check convergence,
-            #  otherwise it is a secondary return
-            value = np.sum(kl_div(self.X, np.dot(W, H)))
+        WH = np.dot(W,H)
+        frobenius_loss = 1/2*np.linalg.norm(self.X - WH)**2
+        kl_loss = np.sum(kl_div(self.X, WH))
+
+        output_dic = {
+            'frobenius': frobenius_loss,
+            'kl': kl_loss, 
+        }
+
         if self.true_factors:
             #  compute factor match score
             #  first, solve permutation and scaling ambiguity
@@ -89,10 +85,12 @@ class Objective(BaseObjective):
             perms = np.argmax((W.T@W_true)*(Ht.T@Ht_true), axis=1)
             W = W[:, perms]
             Ht = Ht[:, perms]
-            fms = np.prod(np.diag(W.T@W_true)*np.diag(Ht.T@Ht_true))
+            factor_match_score = np.prod(np.diag(W.T@W_true)*np.diag(Ht.T@Ht_true))
 
-            return {'value': value, 'fms': fms}
-        return value
+            output_dic.update({
+                'factor_match_score': factor_match_score
+                })
+        return output_dic
 
     def get_objective(self, random_state=27):
         # The output of this function are the keyword arguments
