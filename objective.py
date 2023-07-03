@@ -7,20 +7,21 @@ with safe_import_context() as import_ctx:
     # importing scipy for KL div
     from scipy.special import kl_div
     # Requires Tensorly >=0.8, postpone implementation
-    #import tensorly
+    # import tensorly
     # from tensorly.cp_tensor import cp_normalize, cp_permute_factors
 
 
-
 class Objective(BaseObjective):
+    min_benchopt_version = "1.3"
     name = "Nonnegative Matrix Factorization"
     is_convex = False
 
     # All parameters 'p' defined here are available as 'self.p'
     parameters = {
         'share_init': [True],
+        # TODO: 'all' for all losses simult
         # losses will be computed on different runs
-        'loss_type': ['frobenius']#, 'kl']  # TODO: 'all' for all losses simult
+        'loss_type': ['frobenius']  # , 'kl']
     }
 
     # install_cmd = 'conda'
@@ -64,32 +65,35 @@ class Objective(BaseObjective):
             Ht = H.T
             Ht_true = H_true.T
 
-            ## tensorly version, requires Tensorly >= 0.8
+            # tensorly version, requires Tensorly >= 0.8
             # factors_tl = [W, Ht]
             # factors_tl_true = [W_true, Ht_true]
             # factors_tl = cp_normalize((None,factors_tl))
             # factors_tl_true = cp_normalize((None,factors_tl_true))
-            # _, factors_tl = cp_permute_factors((None,factors_tl_true), (None,factors_tl))[0]
+            # _, factors_tl = cp_permute_factors(
+            #     (None,factors_tl_true), (None,factors_tl)
+            # )[0]
             # fms = np.prod(
             #     np.diag(factors_tl[0].T@factors_tl_true[0])*
             #     np.diag(factors_tl[1].T@factors_tl_true[1])
-            #     )
-            
-            ## native version
+            # )
+
+            # native version
             W = W/np.linalg.norm(W, axis=0)
             Ht = Ht/np.linalg.norm(Ht, axis=0)
             W_true = W_true/np.linalg.norm(W_true, axis=0)
             Ht_true = Ht_true/np.linalg.norm(Ht_true, axis=0)
-            # TODO: suboptimal permutation for now, want to use tensorly but bugged
+            # TODO: suboptimal permutation for now, want to use tensorly
+            # but it is bugged
             perms = np.argmax((W.T@W_true)*(Ht.T@Ht_true), axis=1)
             W = W[:, perms]
             Ht = Ht[:, perms]
             fms = np.prod(np.diag(W.T@W_true)*np.diag(Ht.T@Ht_true))
-            
+
             return {'value': value, 'fms': fms}
         return value
 
-    def to_dict(self, random_state=27):
+    def get_objective(self, random_state=27):
         # The output of this function are the keyword arguments
         # for the `set_objective` method of the solver.
         # They are customizable.
