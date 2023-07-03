@@ -2,16 +2,17 @@
 
 Sprint July 2023 TODOS:
 -----------------------
-- Benchmark NMF: finish it
-  - compute all losses all the time
-  - fix suboptimal permutation at evaluation with tensorly
-  - add other data (e.g. faces?)
-  - (optional) fix nimfa, add other solvers
-  - (optional) fix scikit-learn +1 iteration being unfair
+- Benchmark NMF: finished?
 
 - Documentation more practical (could need some help):
-  - Tutorial on how to write a benchmark ? (use a simple case like ridge?). Useful for devs to better know how to implement new benchmarks, useful for users who understand how it works and the basic ways to tweak a benchmark. Include a graph of relationship between the methods of classes. Start from template benchmark and add regularization. Add another simulation or a true dataset?
+  - Tutorial on how to write a benchmark ? (use a simple case like ridge?). Useful for devs to better know how to implement new benchmarks, useful for users who understand how it works and the basic ways to run and tweak a benchmark. Include a graph of relationship between the methods of classes. Start from template benchmark and add regularization. Add another simulation or a true dataset?
   - other solution: start from scratch (longer and less robust)
+  - other thing: tutorial to reproduce the NMF benchmark, or start a FAQ with the various points raised in the NMF benchmark
+    - shared init -> given by the objective; solver-wise smart init belongs to each solver.
+    - ground truth, provided by the dataset to the objective
+    - several strategies / objectives for each solver, several loss for evaluation
+    - installing packages
+    - 
   - Cheatsheet with common command lines
 
 Sprint November 2022 comments
