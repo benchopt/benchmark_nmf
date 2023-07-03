@@ -17,7 +17,8 @@ class Solver(BaseSolver):
 
     # any parameter defined here is accessible as a class attribute
     parameters = {
-        'strategy': ['MU', 'HALS']
+        'strategy': ['MU', 'HALS'],
+        'loss': ['euclidean'] 
     }
 
     stopping_criterion = SufficientProgressCriterion(strategy="iteration", key_to_monitor="objective_frobenius")
