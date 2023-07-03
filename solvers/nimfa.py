@@ -16,14 +16,16 @@ class Solver(BaseSolver):
     # any parameter defined here is accessible as a class attribute
     parameters = {
         'strategy': ['MU', 'ALS-PG'],
-        'loss': ['euclidean']  # Other choices: 'divergence' (for KL)
+        'loss': ['euclidean'],  # Other choices: 'divergence' (for KL)
+        'sub_iter_max': [10],
     }
 
-    stopping_strategy = "iteration"
+    #stopping_strategy = "iteration"
 
     install_cmd = 'conda'
     requirements = ['pip:nimfa']
-    stopping_criterion = SufficientProgressCriterion(patience=20)  # TODO check if fixes issue
+    
+    stopping_criterion = SufficientProgressCriterion(strategy="iteration", key_to_monitor="objective_frobenius", patience=20)
 
     def skip(self, X, rank, factors_init):
         if self.loss != "euclidean" and self.strategy != "MU":
@@ -61,8 +63,8 @@ class Solver(BaseSolver):
         elif self.strategy == 'ALS-PG':
             # TODO: Add inner_sub_iter to parameters ?
             nmf = nimfa.Lsnmf(
-                self.X, rank=self.rank, max_iter=n_iter, sub_iter=10,
-                inner_sub_iter=10, beta=0.1, W=W, H=H
+                self.X, rank=self.rank, max_iter=n_iter, sub_iter=self.sub_iter_max,
+                inner_sub_iter=self.sub_iter_max, beta=0.1, W=W, H=H
             )
         else:
             raise ValueError("Strategy not suported")
