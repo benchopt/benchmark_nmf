@@ -23,8 +23,6 @@ class Solver(BaseSolver):
 
     stopping_criterion = SufficientProgressCriterion(strategy="iteration", key_to_monitor="objective_frobenius")
 
-    #stopping_strategy = "iteration" TODO: callback ?
-
     install_cmd = 'conda'
     requirements = ['pip:tensorly']
 

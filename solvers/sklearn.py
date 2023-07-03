@@ -52,7 +52,12 @@ class Solver(BaseSolver):
 
     def run(self, n_iter):
         # sklearn doesn't work with max_iter=0
-        self.clf.max_iter = max(n_iter,1)# + 1
+        if n_iter==0:
+            self.W = self.factors_init[0]
+            self.clf.components_ = self.factors_init[1]
+            return
+        else:
+            self.clf.max_iter = n_iter
 
         if self.clf.init == "custom":
             self.W = self.clf.fit_transform(

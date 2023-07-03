@@ -6,9 +6,8 @@ with safe_import_context() as import_ctx:
     import numpy as np
     from scipy.special import kl_div
     # Requires Tensorly >=0.8, postpone implementation
-    # TODO
-    # import tensorly
-    # from tensorly.cp_tensor import cp_normalize, cp_permute_factors
+    #import tensorly
+    from tensorly.cp_tensor import cp_normalize, cp_permute_factors
 
 
 class Objective(BaseObjective):
@@ -21,10 +20,10 @@ class Objective(BaseObjective):
         'share_init': [True],
     }
 
-    # install_cmd = 'conda'
-    # requirements = [
-    #     'pip:git+https://github.com/tensorly/tensorly@main'
-    # ]
+    install_cmd = 'conda'
+    requirements = [
+        'pip:git+https://github.com/tensorly/tensorly@main'
+    ]
 
     def get_one_solution(self):
         # Return one solution. This should be compatible with 'self.compute'.
@@ -35,8 +34,6 @@ class Objective(BaseObjective):
         # The keyword arguments of this function are the keys of the `data`
         # dict in the `get_data` function of the dataset.
         # They are customizable.
-        # TODO: handle W and H known in only some cases, to track source
-        # identification
         self.X = X
         self.rank = rank
         self.true_factors = true_factors
@@ -62,30 +59,14 @@ class Objective(BaseObjective):
             Ht = H.T
             Ht_true = H_true.T
 
-            # tensorly version, requires Tensorly >= 0.8
-            # factors_tl = [W, Ht]
-            # factors_tl_true = [W_true, Ht_true]
-            # factors_tl = cp_normalize((None,factors_tl))
-            # factors_tl_true = cp_normalize((None,factors_tl_true))
-            # _, factors_tl = cp_permute_factors(
-            #     (None,factors_tl_true), (None,factors_tl)
-            # )[0]
-            # fms = np.prod(
-            #     np.diag(factors_tl[0].T@factors_tl_true[0])*
-            #     np.diag(factors_tl[1].T@factors_tl_true[1])
-            # )
-
-            # native version
-            W = W/np.linalg.norm(W, axis=0)
-            Ht = Ht/np.linalg.norm(Ht, axis=0)
-            W_true = W_true/np.linalg.norm(W_true, axis=0)
-            Ht_true = Ht_true/np.linalg.norm(Ht_true, axis=0)
-            # TODO: suboptimal permutation for now, want to use tensorly
-            # but it is bugged
-            perms = np.argmax((W.T@W_true)*(Ht.T@Ht_true), axis=1)
-            W = W[:, perms]
-            Ht = Ht[:, perms]
-            factor_match_score = np.prod(np.diag(W.T@W_true)*np.diag(Ht.T@Ht_true))
+            #tensorly version, requires Tensorly >= 0.8
+            cp_tl = cp_normalize((None,[W, Ht]))
+            cp_tl_true = cp_normalize((None,[W_true, Ht_true]))
+            cp_tl, _ = cp_permute_factors(cp_tl_true, cp_tl)
+            factor_match_score = np.prod(
+                np.diag(cp_tl[1][0].T@cp_tl_true[1][0])*
+                np.diag(cp_tl[1][1].T@cp_tl_true[1][1])
+            )
 
             output_dic.update({
                 'factor_match_score': factor_match_score
