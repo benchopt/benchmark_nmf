@@ -52,7 +52,7 @@ class Objective(BaseObjective):
 
         output_dic = {
             'frobenius': frobenius_loss,
-            'kl': kl_loss, 
+            'kullback-leibler': kl_loss, 
         }
 
         if self.true_factors:

@@ -1,4 +1,5 @@
 from benchopt import BaseSolver, safe_import_context
+from benchopt.stopping_criterion import SufficientProgressCriterion
 
 
 with safe_import_context() as import_ctx:
@@ -6,6 +7,7 @@ with safe_import_context() as import_ctx:
     from tensorly.decomposition._nn_cp import non_negative_parafac
     from tensorly.decomposition._nn_cp import non_negative_parafac_hals
 
+#TODO fix??
 
 class Solver(BaseSolver):
     '''
@@ -18,7 +20,9 @@ class Solver(BaseSolver):
         'strategy': ['MU', 'HALS']
     }
 
-    stopping_strategy = "iteration"
+    stopping_criterion = SufficientProgressCriterion(strategy="iteration", key_to_monitor="objective_frobenius")
+
+    #stopping_strategy = "iteration" TODO: callback ?
 
     install_cmd = 'conda'
     requirements = ['pip:tensorly']
