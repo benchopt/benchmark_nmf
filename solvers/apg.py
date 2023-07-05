@@ -13,10 +13,10 @@ class Solver(BaseSolver):
 
     # any parameter defined here is accessible as a class attribute
     parameters = {
-        'n_inner_iter': [1, 5]
+        'n_inner_iter': [1, 5],
+        'loss': ['euclidean']
     }
     
-    # TODO: have to append "objective" ^^
     stopping_criterion = SufficientProgressCriterion(strategy="callback", key_to_monitor="objective_frobenius")
 
     def set_objective(self, X, rank, factors_init):

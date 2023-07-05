@@ -19,8 +19,6 @@ class Solver(BaseSolver):
         'sub_iter_max': [10],
     }
 
-    #stopping_strategy = "iteration"
-
     install_cmd = 'conda'
     requirements = ['pip:nimfa']
     

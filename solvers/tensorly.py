@@ -7,7 +7,6 @@ with safe_import_context() as import_ctx:
     from tensorly.decomposition._nn_cp import non_negative_parafac
     from tensorly.decomposition._nn_cp import non_negative_parafac_hals
 
-#TODO fix??
 
 class Solver(BaseSolver):
     '''
