@@ -1,4 +1,5 @@
 from benchopt import BaseSolver, safe_import_context
+from benchopt.stopping_criterion import SufficientProgressCriterion
 
 with safe_import_context() as import_ctx:
     import numpy as np
@@ -12,10 +13,11 @@ class Solver(BaseSolver):
 
     # any parameter defined here is accessible as a class attribute
     parameters = {
-        'n_inner_iter': [1, 5]
+        'n_inner_iter': [1, 5],
+        'loss': ['euclidean']
     }
-
-    stopping_strategy = "callback"
+    
+    stopping_criterion = SufficientProgressCriterion(strategy="callback", key_to_monitor="objective_frobenius")
 
     def set_objective(self, X, rank, factors_init):
         # The arguments of this function are the results of the

@@ -1,4 +1,5 @@
 from benchopt import BaseSolver, safe_import_context
+from benchopt.stopping_criterion import SufficientProgressCriterion
 
 
 with safe_import_context() as import_ctx:
@@ -15,10 +16,11 @@ class Solver(BaseSolver):
 
     # any parameter defined here is accessible as a class attribute
     parameters = {
-        'strategy': ['MU', 'HALS']
+        'strategy': ['MU', 'HALS'],
+        'loss': ['euclidean'] 
     }
 
-    stopping_strategy = "iteration"
+    stopping_criterion = SufficientProgressCriterion(strategy="iteration", key_to_monitor="objective_frobenius")
 
     install_cmd = 'conda'
     requirements = ['pip:tensorly']

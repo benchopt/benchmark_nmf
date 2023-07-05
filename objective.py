@@ -4,11 +4,10 @@ from benchopt import BaseObjective, safe_import_context
 # Useful for autocompletion and install commands
 with safe_import_context() as import_ctx:
     import numpy as np
-    # importing scipy for KL div
     from scipy.special import kl_div
     # Requires Tensorly >=0.8, postpone implementation
-    # import tensorly
-    # from tensorly.cp_tensor import cp_normalize, cp_permute_factors
+    #import tensorly
+    from tensorly.cp_tensor import cp_normalize, cp_permute_factors
 
 
 class Objective(BaseObjective):
@@ -19,15 +18,12 @@ class Objective(BaseObjective):
     # All parameters 'p' defined here are available as 'self.p'
     parameters = {
         'share_init': [True],
-        # TODO: 'all' for all losses simult
-        # losses will be computed on different runs
-        'loss_type': ['frobenius']  # , 'kl']
     }
 
-    # install_cmd = 'conda'
-    # requirements = [
-    #     'pip:git+https://github.com/tensorly/tensorly@main'
-    # ]
+    install_cmd = 'conda'
+    requirements = [
+        'pip:git+https://github.com/tensorly/tensorly@main'
+    ]
 
     def get_one_solution(self):
         # Return one solution. This should be compatible with 'self.compute'.
@@ -38,8 +34,6 @@ class Objective(BaseObjective):
         # The keyword arguments of this function are the keys of the `data`
         # dict in the `get_data` function of the dataset.
         # They are customizable.
-        # TODO: handle W and H known in only some cases, to track source
-        # identification
         self.X = X
         self.rank = rank
         self.true_factors = true_factors
@@ -48,16 +42,16 @@ class Objective(BaseObjective):
         # The arguments of this function are the outputs of the
         # `get_result` method of the solver.
         # They are customizable.
-        # Note: one particular metric should be used to check convergence,
-        # thus the logic on outputs.
         W, H = factors
-        if 'frobenius' == self.loss_type:
-            # If frobenius is asked, use it to check convergence
-            value = 1/2*np.linalg.norm(self.X - np.dot(W, H))**2
-        if 'kl' == self.loss_type:
-            # If KL is asked but not frobenius, use it to check convergence,
-            #  otherwise it is a secondary return
-            value = np.sum(kl_div(self.X, np.dot(W, H)))
+        WH = np.dot(W,H)
+        frobenius_loss = 1/2*np.linalg.norm(self.X - WH)**2
+        kl_loss = np.sum(kl_div(self.X, WH))
+
+        output_dic = {
+            'frobenius': frobenius_loss,
+            'kullback-leibler': kl_loss, 
+        }
+
         if self.true_factors:
             #  compute factor match score
             #  first, solve permutation and scaling ambiguity
@@ -65,33 +59,19 @@ class Objective(BaseObjective):
             Ht = H.T
             Ht_true = H_true.T
 
-            # tensorly version, requires Tensorly >= 0.8
-            # factors_tl = [W, Ht]
-            # factors_tl_true = [W_true, Ht_true]
-            # factors_tl = cp_normalize((None,factors_tl))
-            # factors_tl_true = cp_normalize((None,factors_tl_true))
-            # _, factors_tl = cp_permute_factors(
-            #     (None,factors_tl_true), (None,factors_tl)
-            # )[0]
-            # fms = np.prod(
-            #     np.diag(factors_tl[0].T@factors_tl_true[0])*
-            #     np.diag(factors_tl[1].T@factors_tl_true[1])
-            # )
+            #tensorly version, requires Tensorly >= 0.8
+            cp_tl = cp_normalize((None,[W, Ht]))
+            cp_tl_true = cp_normalize((None,[W_true, Ht_true]))
+            cp_tl, _ = cp_permute_factors(cp_tl_true, cp_tl)
+            factor_match_score = np.prod(
+                np.diag(cp_tl[1][0].T@cp_tl_true[1][0])*
+                np.diag(cp_tl[1][1].T@cp_tl_true[1][1])
+            )
 
-            # native version
-            W = W/np.linalg.norm(W, axis=0)
-            Ht = Ht/np.linalg.norm(Ht, axis=0)
-            W_true = W_true/np.linalg.norm(W_true, axis=0)
-            Ht_true = Ht_true/np.linalg.norm(Ht_true, axis=0)
-            # TODO: suboptimal permutation for now, want to use tensorly
-            # but it is bugged
-            perms = np.argmax((W.T@W_true)*(Ht.T@Ht_true), axis=1)
-            W = W[:, perms]
-            Ht = Ht[:, perms]
-            fms = np.prod(np.diag(W.T@W_true)*np.diag(Ht.T@Ht_true))
-
-            return {'value': value, 'fms': fms}
-        return value
+            output_dic.update({
+                'factor_match_score': factor_match_score
+                })
+        return output_dic
 
     def get_objective(self, random_state=27):
         # The output of this function are the keyword arguments

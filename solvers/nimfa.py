@@ -1,4 +1,5 @@
 from benchopt import BaseSolver, safe_import_context
+from benchopt.stopping_criterion import SufficientProgressCriterion
 
 with safe_import_context() as import_ctx:
     import nimfa
@@ -8,20 +9,20 @@ with safe_import_context() as import_ctx:
 class Solver(BaseSolver):
     '''
     MU implementations in nimfa
-    TODO: change loss depending on user input? cf scikit learn
     '''
     name = "nimfa"
 
     # any parameter defined here is accessible as a class attribute
     parameters = {
         'strategy': ['MU', 'ALS-PG'],
-        'loss': ['euclidean']  # Other choices: 'divergence' (for KL)
+        'loss': ['euclidean'],  # Other choices: 'divergence' (for KL)
+        'sub_iter_max': [10],
     }
-
-    stopping_strategy = "iteration"
 
     install_cmd = 'conda'
     requirements = ['pip:nimfa']
+    
+    stopping_criterion = SufficientProgressCriterion(strategy="iteration", key_to_monitor="objective_frobenius")
 
     def skip(self, X, rank, factors_init):
         if self.loss != "euclidean" and self.strategy != "MU":
@@ -51,16 +52,19 @@ class Solver(BaseSolver):
             W = np.copy(self.init[0])
             H = np.copy(self.init[1])
 
+        if n_iter==0:
+            self.factors = [np.array(W), np.array(H)]
+            return
+
         if self.strategy == 'MU':
             nmf = nimfa.Nmf(
                 self.X, rank=self.rank, update=self.loss, max_iter=n_iter,
                 min_residual=0, W=W, H=H, test_conv=0
             )
         elif self.strategy == 'ALS-PG':
-            # TODO: Add inner_sub_iter to parameters ?
             nmf = nimfa.Lsnmf(
-                self.X, rank=self.rank, max_iter=n_iter, sub_iter=10,
-                inner_sub_iter=10, beta=0.1, W=W, H=H
+                self.X, rank=self.rank, max_iter=n_iter, sub_iter=self.sub_iter_max,
+                inner_sub_iter=self.sub_iter_max, beta=0.1, W=W, H=H
             )
         else:
             raise ValueError("Strategy not suported")
