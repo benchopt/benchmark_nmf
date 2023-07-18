@@ -9,18 +9,20 @@ with safe_import_context() as import_ctx:
 
 
 class Solver(BaseSolver):
-    '''
+    """
     HALS and MU implementations in tensorly
-    '''
+    """
     name = "tensorly"
 
     # any parameter defined here is accessible as a class attribute
     parameters = {
         'strategy': ['MU', 'HALS'],
-        'loss': ['euclidean'] 
+        'loss': ['euclidean']
     }
 
-    stopping_criterion = SufficientProgressCriterion(strategy="iteration", key_to_monitor="objective_frobenius")
+    stopping_criterion = SufficientProgressCriterion(
+        strategy="iteration", key_to_monitor="objective_frobenius"
+    )
 
     install_cmd = 'conda'
     requirements = ['pip:tensorly']
