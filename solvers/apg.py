@@ -6,9 +6,9 @@ with safe_import_context() as import_ctx:
 
 
 class Solver(BaseSolver):
-    '''
+    """
     Alternating Proximal gradient
-    '''
+    """
     name = "apg"
 
     # any parameter defined here is accessible as a class attribute
@@ -16,8 +16,10 @@ class Solver(BaseSolver):
         'n_inner_iter': [1, 5],
         'loss': ['euclidean']
     }
-    
-    stopping_criterion = SufficientProgressCriterion(strategy="callback", key_to_monitor="objective_frobenius")
+
+    stopping_criterion = SufficientProgressCriterion(
+        strategy="callback", key_to_monitor="objective_frobenius"
+    )
 
     def set_objective(self, X, rank, factors_init):
         # The arguments of this function are the results of the
@@ -43,18 +45,16 @@ class Solver(BaseSolver):
             XHt = np.dot(self.X, H.T)
             Lw = np.linalg.norm(HHt)  # upper bound of Lw
             # W update
-            for inner in range(n_inner_iter):
-                W = np.maximum(
-                    W - (np.dot(W, HHt) - XHt) / Lw, 0)
+            for _ in range(n_inner_iter):
+                W = np.maximum(W - (np.dot(W, HHt) - XHt) / Lw, 0)
 
             # H update
             WtW = np.dot(W.T, W)
             WtX = np.dot(W.T, self.X)
             Lh = np.linalg.norm(WtW)  # upper bound for Lh
             # H update
-            for inner in range(n_inner_iter):
-                H = np.maximum(
-                    H - (np.dot(WtW, H) - WtX) / Lh, 0)
+            for _ in range(n_inner_iter):
+                H = np.maximum(H - (np.dot(WtW, H) - WtX) / Lh, 0)
 
         self.factors = [W, H]
 

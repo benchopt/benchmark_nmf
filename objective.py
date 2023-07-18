@@ -6,7 +6,7 @@ with safe_import_context() as import_ctx:
     import numpy as np
     from scipy.special import kl_div
     # Requires Tensorly >=0.8, postpone implementation
-    #import tensorly
+    # import tensorly
     from tensorly.cp_tensor import cp_normalize, cp_permute_factors
 
 
@@ -43,13 +43,13 @@ class Objective(BaseObjective):
         # `get_result` method of the solver.
         # They are customizable.
         W, H = factors
-        WH = np.dot(W,H)
-        frobenius_loss = 1/2*np.linalg.norm(self.X - WH)**2
+        WH = np.dot(W, H)
+        frobenius_loss = 1/2 * np.linalg.norm(self.X - WH, ord="fro")**2
         kl_loss = np.sum(kl_div(self.X, WH))
 
-        output_dic = {
+        output_dict = {
             'frobenius': frobenius_loss,
-            'kullback-leibler': kl_loss, 
+            'kullback-leibler': kl_loss,
         }
 
         if self.true_factors:
@@ -59,19 +59,19 @@ class Objective(BaseObjective):
             Ht = H.T
             Ht_true = H_true.T
 
-            #tensorly version, requires Tensorly >= 0.8
-            cp_tl = cp_normalize((None,[W, Ht]))
-            cp_tl_true = cp_normalize((None,[W_true, Ht_true]))
+            # tensorly version, requires Tensorly >= 0.8
+            cp_tl = cp_normalize((None, [W, Ht]))
+            cp_tl_true = cp_normalize((None, [W_true, Ht_true]))
             cp_tl, _ = cp_permute_factors(cp_tl_true, cp_tl)
             factor_match_score = np.prod(
-                np.diag(cp_tl[1][0].T@cp_tl_true[1][0])*
-                np.diag(cp_tl[1][1].T@cp_tl_true[1][1])
+                np.diag(cp_tl[1][0].T @ cp_tl_true[1][0]) *
+                np.diag(cp_tl[1][1].T @ cp_tl_true[1][1])
             )
 
-            output_dic.update({
+            output_dict.update({
                 'factor_match_score': factor_match_score
-                })
-        return output_dic
+            })
+        return output_dict
 
     def get_objective(self, random_state=27):
         # The output of this function are the keyword arguments

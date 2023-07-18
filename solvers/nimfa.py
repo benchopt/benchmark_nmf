@@ -7,9 +7,9 @@ with safe_import_context() as import_ctx:
 
 
 class Solver(BaseSolver):
-    '''
+    """
     MU implementations in nimfa
-    '''
+    """
     name = "nimfa"
 
     # any parameter defined here is accessible as a class attribute
@@ -21,8 +21,10 @@ class Solver(BaseSolver):
 
     install_cmd = 'conda'
     requirements = ['pip:nimfa']
-    
-    stopping_criterion = SufficientProgressCriterion(strategy="iteration", key_to_monitor="objective_frobenius")
+
+    stopping_criterion = SufficientProgressCriterion(
+        strategy="iteration", key_to_monitor="objective_frobenius"
+    )
 
     def skip(self, X, rank, factors_init):
         if self.loss != "euclidean" and self.strategy != "MU":
@@ -52,7 +54,7 @@ class Solver(BaseSolver):
             W = np.copy(self.init[0])
             H = np.copy(self.init[1])
 
-        if n_iter==0:
+        if n_iter == 0:
             self.factors = [np.array(W), np.array(H)]
             return
 
@@ -63,7 +65,8 @@ class Solver(BaseSolver):
             )
         elif self.strategy == 'ALS-PG':
             nmf = nimfa.Lsnmf(
-                self.X, rank=self.rank, max_iter=n_iter, sub_iter=self.sub_iter_max,
+                self.X, rank=self.rank, max_iter=n_iter,
+                sub_iter=self.sub_iter_max,
                 inner_sub_iter=self.sub_iter_max, beta=0.1, W=W, H=H
             )
         else:

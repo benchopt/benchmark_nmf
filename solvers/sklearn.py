@@ -18,10 +18,12 @@ class Solver(BaseSolver):
     parameters = {
         "strategy": ["cd", "mu"],
         # Other loss choices: float, "kullback-leibler", "itakura-saito"
-        "loss": ["frobenius","kullback-leibler"]
+        "loss": ["frobenius", "kullback-leibler"]
     }
 
-    stopping_criterion = SufficientProgressCriterion(strategy="iteration", key_to_monitor="objective_frobenius")
+    stopping_criterion = SufficientProgressCriterion(
+        strategy="iteration", key_to_monitor="objective_frobenius"
+    )
 
     def skip(self, X, rank, factors_init):
         if self.loss == "kullback-leibler" and self.strategy == "cd":
@@ -38,7 +40,7 @@ class Solver(BaseSolver):
         # They are customizable.
         self.X = X
         self.rank = rank
-        self.stopping_criterion.key_to_monitor="objective_"+self.loss
+        self.stopping_criterion.key_to_monitor = "objective_" + self.loss
         if factors_init:
             # creating the scikit-learn problem instance
             self.factors_init = factors_init
@@ -52,7 +54,7 @@ class Solver(BaseSolver):
 
     def run(self, n_iter):
         # sklearn doesn't work with max_iter=0
-        if n_iter==0:
+        if n_iter == 0:
             self.W = self.factors_init[0]
             self.clf.components_ = self.factors_init[1]
             return
