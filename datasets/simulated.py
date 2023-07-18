@@ -15,7 +15,7 @@ class Dataset(BaseDataset):
         'snr': [100],
     }
 
-    def __init__(self, m_dim=10, n_dim=50, true_rank=5, estimated_rank=6,
+    def __init__(self, m_dim=10, n_dim=50, true_rank=3, estimated_rank=3,
                  snr=100, random_state=26):
         # Store the parameters of the dataset
         self.m_dim = m_dim
@@ -34,7 +34,7 @@ class Dataset(BaseDataset):
 
         rng = np.random.RandomState(self.random_state)
         W = rng.rand(self.m_dim, self.true_rank)
-        H = rng.rand(self.true_rank, self.m_dim)
+        H = rng.rand(self.true_rank, self.n_dim)
         X = np.dot(W, H)
         noise = rng.randn(*X.shape)
         sigma = 10**(-self.snr/20) * (

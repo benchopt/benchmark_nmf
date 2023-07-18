@@ -28,7 +28,7 @@ class Objective(BaseObjective):
     def get_one_solution(self):
         # Return one solution. This should be compatible with 'self.compute'.
         n, m = self.X.shape
-        return np.zeros((n, self.rank)), np.zeros((self.rank, m))
+        return np.ones((n, self.rank)), np.ones((self.rank, m))
 
     def set_data(self, X, rank, true_factors=None):
         # The keyword arguments of this function are the keys of the `data`
@@ -48,6 +48,7 @@ class Objective(BaseObjective):
         kl_loss = np.sum(kl_div(self.X, WH))
 
         output_dict = {
+            'value': frobenius_loss,
             'frobenius': frobenius_loss,
             'kullback-leibler': kl_loss,
         }
