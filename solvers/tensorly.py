@@ -50,10 +50,10 @@ class Solver(BaseSolver):
                 init=copy.deepcopy(self.init), tol=0
             )
         factors = out[1]
-        self.factors = [factors[0], factors[1].T]
+        self.W, self.H = factors[0], factors[1].T
 
     def get_result(self):
         # The outputs of this function are the arguments of the
         # `compute` method of the objective.
         # They are customizable.
-        return self.factors
+        return dict(W=self.W, H=self.H)

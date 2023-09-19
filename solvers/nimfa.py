@@ -76,10 +76,10 @@ class Solver(BaseSolver):
         W = nmf_fit.basis()
         H = nmf_fit.coef()
         # Recast to avoid broadcasting and argmax errors
-        self.factors = [np.array(W), np.array(H)]
+        self.W, self.H = np.array(W), np.array(H)
 
     def get_result(self):
         # The outputs of this function are the arguments of the
         # `compute` method of the objective.
         # They are customizable.
-        return self.factors
+        return dict(W=self.W, H=self.H)

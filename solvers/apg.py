@@ -36,30 +36,32 @@ class Solver(BaseSolver):
 
         if not self.factors_init:
             # Random init if init is not provided
-            W, H = [np.random.rand(m, rank), np.random.rand(rank, n)]
+            self.W, self.H = [np.random.rand(m, rank), np.random.rand(rank, n)]
         else:
-            W, H = [np.copy(self.factors_init[i]) for i in range(2)]
+            self.W, self.H = [np.copy(self.factors_init[i]) for i in range(2)]
 
-        while callback((W, H)):
-            HHt = np.dot(H, H.T)
-            XHt = np.dot(self.X, H.T)
+        while callback():
+            HHt = np.dot(self.H, self.H.T)
+            XHt = np.dot(self.X, self.H.T)
             Lw = np.linalg.norm(HHt)  # upper bound of Lw
             # W update
             for _ in range(n_inner_iter):
-                W = np.maximum(W - (np.dot(W, HHt) - XHt) / Lw, 0)
+                self.W = np.maximum(
+                    self.W - (np.dot(self.W, HHt) - XHt) / Lw, 0
+                )
 
             # H update
-            WtW = np.dot(W.T, W)
-            WtX = np.dot(W.T, self.X)
+            WtW = np.dot(self.W.T, self.W)
+            WtX = np.dot(self.W.T, self.X)
             Lh = np.linalg.norm(WtW)  # upper bound for Lh
             # H update
             for _ in range(n_inner_iter):
-                H = np.maximum(H - (np.dot(WtW, H) - WtX) / Lh, 0)
-
-        self.factors = [W, H]
+                self.H = np.maximum(
+                    self.H - (np.dot(WtW, self.H) - WtX) / Lh, 0
+                )
 
     def get_result(self):
         # The outputs of this function are the arguments of the
         # `compute` method of the objective.
         # They are customizable.
-        return self.factors
+        return dict(W=self.W, H=self.H)
