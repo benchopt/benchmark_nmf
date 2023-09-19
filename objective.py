@@ -38,7 +38,7 @@ class Objective(BaseObjective):
         self.rank = rank
         self.true_factors = true_factors
 
-    def compute(self, W, H):
+    def evaluate_result(self, W, H):
         # The arguments of this function are the outputs of the
         # `get_result` method of the solver.
         # They are customizable.
