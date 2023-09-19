@@ -11,7 +11,7 @@ with safe_import_context() as import_ctx:
 
 
 class Objective(BaseObjective):
-    min_benchopt_version = "1.3"
+    min_benchopt_version = "1.5"
     name = "Nonnegative Matrix Factorization"
     is_convex = False
 
@@ -25,10 +25,10 @@ class Objective(BaseObjective):
         'pip:git+https://github.com/tensorly/tensorly@main'
     ]
 
-    def get_one_solution(self):
+    def get_one_result(self):
         # Return one solution. This should be compatible with 'self.compute'.
         n, m = self.X.shape
-        return np.ones((n, self.rank)), np.ones((self.rank, m))
+        return dict(W=np.ones((n, self.rank)), H=np.ones((self.rank, m)))
 
     def set_data(self, X, rank, true_factors=None):
         # The keyword arguments of this function are the keys of the `data`
@@ -38,11 +38,10 @@ class Objective(BaseObjective):
         self.rank = rank
         self.true_factors = true_factors
 
-    def compute(self, factors):
+    def evaluate_result(self, W, H):
         # The arguments of this function are the outputs of the
         # `get_result` method of the solver.
         # They are customizable.
-        W, H = factors
         WH = np.dot(W, H)
         frobenius_loss = 1/2 * np.linalg.norm(self.X - WH, ord="fro")**2
         kl_loss = np.sum(kl_div(self.X, WH))
