@@ -26,10 +26,9 @@ class Solver(BaseSolver):
     )
 
     def skip(self, X, rank, factors_init):
-        if self.loss == "kullback-leibler" and self.strategy == "cd":
+        if self.strategy == "cd" and self.loss != "frobenius":
             return True, (
-                f"{self.name} only implements the MU strategy "
-                "for the chosen {self.loss} loss"
+                f"{self.name} only implements the CD strategy \nfor the Euclidean loss, not for the {self.loss} loss"
             )
 
         return False, None
